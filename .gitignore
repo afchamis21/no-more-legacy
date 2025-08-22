@@ -1,1 +1,47 @@
-﻿./LegacyProjectExamples/**/*
+﻿# Arquivo .gitignore padrão para projetos .NET (Visual Studio)
+
+## Ignore Visual Studio user specific files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore Mac and Windows generated files
+.DS_Store
+Thumbs.db
+
+## Ignore build results
+[Bb]in/
+[Oo]bj/
+
+## Ignore output folders
+/publish/
+/artifacts/
+
+## Ignore package folders
+packages/
+*.nupkg
+*.snupkg
+
+# Ignore Resharper files
+_ReSharper.Caches/
+*.DotSettings.user
+
+# Ignore test results
+TestResults/
+*.trx
+
+# Ignore local configuration files and secrets
+*.secrets.json
+appsettings.Local.json
+
+# ===============================================================
+# SUAS REGRAS PERSONALIZADAS (adicionadas da pergunta anterior)
+# ===============================================================
+
+# Ignorar tudo dentro da pasta LegacyProjectExamples
+LegacyProjectExamples/*
+
+# Mas criar uma exceção para não ignorar os arquivos .zip
+!LegacyProjectExamples/*.zip

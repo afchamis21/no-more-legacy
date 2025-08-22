@@ -1,0 +1,1 @@
+export type SupportedFramework = "Struts" | "Jsf" | "JaxRs" | "AngularJs"
