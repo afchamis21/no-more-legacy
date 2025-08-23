@@ -4,7 +4,7 @@ using NoMoreLegacy.Util;
 namespace NoMoreLegacy.Services.AI.Clients;
 
 public class CodeMergerClient(IConfiguration configuration, ILogger<CodeMergerClient> logger)
-    : OpenAiClient<CodeMergeRequest, CodeMergeResponse>(configuration, logger)
+    : OpenAiClient<CodeMergeRequest, CodeMergeResponse>(configuration, logger, AiClientDeployment.Gpt41Mini)
 {
     protected override string SystemPrompt() =>
         """

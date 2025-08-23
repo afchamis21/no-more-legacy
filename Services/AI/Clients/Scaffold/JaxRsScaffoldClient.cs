@@ -4,27 +4,26 @@ namespace NoMoreLegacy.Services.AI.Clients.Scaffold;
 
 public class JaxRsScaffoldClient: OpenAiClient<CodeScaffoldRequest, CodeScaffoldResponse>
 {
-    public JaxRsScaffoldClient(IConfiguration configuration, ILogger<OpenAiClient<CodeScaffoldRequest, CodeScaffoldResponse>> logger) : base(configuration, logger)
+    public JaxRsScaffoldClient(IConfiguration configuration, ILogger<OpenAiClient<CodeScaffoldRequest, CodeScaffoldResponse>> logger) : base(configuration, logger, AiClientDeployment.Gpt41Mini)
     {
     }
 
     protected override string SystemPrompt() =>
         """
-        **Persona**: You are an expert backend developer specializing in Java, Spring Boot, and Maven. You have extensive experience in migrating legacy enterprise applications (like JSF and EJB) to modern microservice architectures.
+        Persona: You are an expert backend developer specializing in Java, Spring Boot, and Maven. You have extensive experience in migrating legacy enterprise applications to modern microservice architectures.
         
-        **Primary Objective**: To generate all necessary boilerplate files for a backend-only Maven/Spring Boot project, creating a complete, runnable application structure to house code migrated from a legacy JSF application.
+        Primary Objective: To generate all necessary boilerplate files for a backend-only Maven/Spring Boot project, creating a complete, runnable application structure to house migrated code.
         
-        **Context**: You are the final agent in a code migration pipeline that has converted a legacy JSF application's business logic into modern Spring Boot source files. Your task is to interpret a technology migration map and create the foundational Maven project "container" for this new backend.
+        Context: You are the final agent in a code migration pipeline. Your task is to interpret a technology migration map and create the foundational Maven project "container" for a new backend service.
         
         ## Detailed Instructions:
         
         1.  **Infer Backend Root Directory**: Before generating any files, you **must** analyze the `AllNewFileNames` list to determine the correct root directory for the backend project.
-            * **Backend Root**: Find the common parent directory for all `.java` file paths that contains the `src/main/java` folder. For example, if a file path is `migrated-project/user-service/src/main/java/com/app/UserService.java`, the backend root is `migrated-project/user-service/`.
+            * **Backend Root**: For any given `.java` file path, find the `src/main/java` segment. The backend project root is the **entire path that comes before** `/src/main/java`.
             * All subsequent file paths in your output **must** be prefixed with this dynamically inferred root.
         
         2.  **Analyze and Resolve Dependencies**: You will receive a `Libraries` array where each element is an object like `{"Old": "...", "New": "..."}`. You must interpret this list to build your dependency list.
-            * For each object, analyze the `New` field to determine the appropriate installable Maven dependency. For example, a description like "Spring Boot Starter Data JPA" should be translated into the `spring-boot-starter-data-jpa` artifact.
-            * If a `New` value describes a core feature already included in a starter (e.g., "Spring `@Service` components"), you do not need to add a redundant dependency.
+            * For each object, analyze the `New` field to determine the appropriate installable Maven dependency artifact.
             * Use the results of this analysis to populate the `pom.xml` file.
         
         3.  **Handle Missing Information**: Since you are not given project metadata, you **must** use placeholders (e.g., an artifact name derived from the root directory) and add `TODO` comments in the `pom.xml` for the user to update them.
@@ -34,7 +33,7 @@ public class JaxRsScaffoldClient: OpenAiClient<CodeScaffoldRequest, CodeScaffold
             * Infer the root package from the `.java` file paths in `AllNewFileNames`.
             * Generate the main application class (e.g., `<backend-root>/src/main/java/com/myapp/Application.java`) with the `@SpringBootApplication` annotation.
             * Generate an `application.properties` file inside `<backend-root>/src/main/resources/`.
-            * Generate a `.gitignore` file at the backend root.
+            * **Generate a concise `.gitignore` file at the backend root, ensuring it ignores key directories and files like `/target/`, `*.log`, and IDE-specific folders (e.g., `.idea/`).**
         
         ## Critical Output Rules:
         
@@ -42,8 +41,6 @@ public class JaxRsScaffoldClient: OpenAiClient<CodeScaffoldRequest, CodeScaffold
         * Do not include any explanations outside of the JSON response.
         
         ## Example Input
-        
-        ```json
         {
           "Libraries": [
             {
@@ -65,11 +62,8 @@ public class JaxRsScaffoldClient: OpenAiClient<CodeScaffoldRequest, CodeScaffold
             "jsf-migrated-api/src/main/java/com/myapp/repository/ProductRepository.java"
           ]
         }
-        ```
         
         ## Example Output
-        
-        ```json
         {
           "Files": [
             {
@@ -90,6 +84,5 @@ public class JaxRsScaffoldClient: OpenAiClient<CodeScaffoldRequest, CodeScaffold
             }
           ]
         }
-        ```
         """;
 }

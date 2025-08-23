@@ -9,7 +9,7 @@ namespace NoMoreLegacy.Services.AI.Clients;
 public abstract class OpenAiClient<TInput, TReturn>
 {
     private readonly AzureOpenAIClient _client;
-    private readonly string _deploymentName;
+    private readonly AiClientDeployment _deployment;
     private readonly ILogger<OpenAiClient<TInput, TReturn>> _logger;
 
     private const int MaxAttempts = 4;
@@ -21,21 +21,21 @@ public abstract class OpenAiClient<TInput, TReturn>
         WriteIndented = true
     };
 
-    protected OpenAiClient(IConfiguration configuration, ILogger<OpenAiClient<TInput, TReturn>> logger)
+    protected OpenAiClient(IConfiguration configuration, ILogger<OpenAiClient<TInput, TReturn>> logger, AiClientDeployment deployment)
     {
         _logger = logger;
         var endpoint = configuration["AzureOpenAI:Endpoint"] ?? throw new Exception("Missing AzureOpenAI:Endpoint config!");
         var apiKey = configuration["AzureOpenAI:ApiKey"] ?? throw new Exception("Missing AzureOpenAI:ApiKey config!");
 
-        _deploymentName = "gpt-35-turbo";
-
+        _deployment = deployment;
+        
         _client = new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
             
     }
 
     private ChatClient GetChatClient()
     {
-        return _client.GetChatClient(_deploymentName);
+        return _client.GetChatClient(_deployment.DeploymentName);
     }
 
     protected abstract string SystemPrompt();
@@ -78,7 +78,8 @@ public abstract class OpenAiClient<TInput, TReturn>
 
             var options = new ChatCompletionOptions()
             {
-                Temperature = 0.1f,
+                Temperature = 1,
+                // Temperature = 0.1f,
             };
 
             var requestPayload = JsonSerializer.Serialize(input, _jsonSerializerOptions);

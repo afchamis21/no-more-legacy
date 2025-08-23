@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useProjectService } from "../context/ProjectService";
-import type { SupportedFramework } from "../types/SupportedFramework";
+import { useProjectService } from "../../context/ProjectService";
+import type { SupportedFramework } from "../../types/SupportedFramework";
 
 export function ProjectForm() {
   const [projectType, setProjectType] = useState<SupportedFramework | "">("");
@@ -11,10 +11,10 @@ export function ProjectForm() {
 
   const SupportedFramework: { value: SupportedFramework | ""; label: string }[] = [
     { value: "", label: "Selecione uma opção" },
-    { value: "Struts", label: "Struts" },
-    { value: "Jsf", label: "Jsf" },
-    { value: "JaxRs", label: "JaxRs" },
     { value: "AngularJs", label: "AngularJs" },
+    { value: "JaxRs", label: "JaxRs" },
+    { value: "Jsf", label: "Jsf" },
+    { value: "Struts", label: "Struts" },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,8 +31,7 @@ export function ProjectForm() {
     setErrors(newErrors);
 
     if (file && projectType) {
-      projectService.upload(file, projectType);
-      console.log("Form submitted:", { projectType, file });
+      projectService.convert(file, projectType);
     }
   };
 

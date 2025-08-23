@@ -9,7 +9,7 @@ export async function ApiConversion(framework: SupportedFramework, file: File) {
     return api.post("api/Conversor", formData, {
         params: {
             framework,
-            responseType: 'blob'
-        }
+        },
+        responseType: 'blob'
     })
 }

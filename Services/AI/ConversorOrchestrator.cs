@@ -28,14 +28,14 @@ public class ConversorOrchestrator
     #endregion
 
     #region Scaffold
-    private readonly AngularScaffoldClient _angularScaffoldClient;
+    private readonly AngularJsScaffoldClient _angularJsScaffoldClient;
     private readonly JaxRsScaffoldClient _jaxRsScaffoldClient;
     private readonly JsfScaffoldClient _jsfScaffoldClient;
     private readonly StrutScaffoldClient _strutScaffoldClient;
     
     #endregion
 
-    public ConversorOrchestrator(FileGrouperClient fileGrouperClient, ContextExtractorClient contextExtractorClient, TestValidationClient testValidationClient, CodeMergerClient codeMergerClient, AngularJsFileConverterClient angularJsFileConverterClient, JaxRsFileConverterClient jaxRsFileConverterClient, JsfFileConverterClient jsfFileConverterClient, StrutFileConverterClient strutFileConverterClient, ILogger<ConversorOrchestrator> logger, AngularScaffoldClient angularScaffoldClient, JaxRsScaffoldClient jaxRsScaffoldClient, JsfScaffoldClient jsfScaffoldClient, StrutScaffoldClient strutScaffoldClient)
+    public ConversorOrchestrator(FileGrouperClient fileGrouperClient, ContextExtractorClient contextExtractorClient, TestValidationClient testValidationClient, CodeMergerClient codeMergerClient, AngularJsFileConverterClient angularJsFileConverterClient, JaxRsFileConverterClient jaxRsFileConverterClient, JsfFileConverterClient jsfFileConverterClient, StrutFileConverterClient strutFileConverterClient, ILogger<ConversorOrchestrator> logger, AngularJsScaffoldClient angularJsScaffoldClient, JaxRsScaffoldClient jaxRsScaffoldClient, JsfScaffoldClient jsfScaffoldClient, StrutScaffoldClient strutScaffoldClient)
     {
         _contextExtractorClient = contextExtractorClient;
         _testValidationClient = testValidationClient;
@@ -45,7 +45,7 @@ public class ConversorOrchestrator
         _jsfFileConverterClient = jsfFileConverterClient;
         _strutFileConverterClient = strutFileConverterClient;
         _logger = logger;
-        _angularScaffoldClient = angularScaffoldClient;
+        _angularJsScaffoldClient = angularJsScaffoldClient;
         _jaxRsScaffoldClient = jaxRsScaffoldClient;
         _jsfScaffoldClient = jsfScaffoldClient;
         _strutScaffoldClient = strutScaffoldClient;
@@ -239,7 +239,7 @@ public class ConversorOrchestrator
     
     private OpenAiClient<CodeScaffoldRequest, CodeScaffoldResponse> GetScaffoldClient(SupportedFramework framework) => framework switch
     {
-        SupportedFramework.AngularJs => _angularScaffoldClient,
+        SupportedFramework.AngularJs => _angularJsScaffoldClient,
         SupportedFramework.JaxRs => _jaxRsScaffoldClient,
         SupportedFramework.Jsf => _jsfScaffoldClient,
         SupportedFramework.Struts => _strutScaffoldClient,

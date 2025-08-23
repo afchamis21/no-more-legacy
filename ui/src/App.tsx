@@ -1,11 +1,21 @@
+import { Toaster } from "react-hot-toast";
 import ProjectServiceProvider from "./context/ProjectService";
-import { UploadView } from "./pages/Upload";
+import { Router } from "./Router";
 
 function App() {
   return (
-    <ProjectServiceProvider>
-      <UploadView />
-    </ProjectServiceProvider>
+    <>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 5000,
+        }}
+      />
+      <ProjectServiceProvider>
+        <Router />
+      </ProjectServiceProvider>
+    </>
   );
 }
 

@@ -72,21 +72,20 @@ public class FileService
         _logger.LogInformation("Creating a new zip archive with [{FileCount}] files.", files.Count);
 
         using var memoryStream = new MemoryStream();
-        // O 'true' no final (leaveOpen) é importante para que o ZipArchive não feche o MemoryStream
+        
         using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
         {
             foreach (var file in files)
             {
-                // Cria uma nova entrada (arquivo) dentro do ZIP
                 var entry = archive.CreateEntry(file.FileName, CompressionLevel.Optimal);
 
-                // Abre a entrada para escrita e copia o conteúdo em bytes para ela
-                await using var entryStream = entry.Open();
-                await entryStream.WriteAsync(file.FileContent, 0, file.FileContent.Length);
+                await using (var entryStream = entry.Open())
+                {
+                    await entryStream.WriteAsync(file.FileContent.AsMemory(0, file.FileContent.Length));
+                }
             }
-        } // O 'using' do ZipArchive finaliza o arquivo ZIP aqui
+        }
 
-        // Retorna o array de bytes completo do ZIP gerado
         return memoryStream.ToArray();
     }
 }

@@ -4,7 +4,7 @@ using NoMoreLegacy.Services.AI.HTTP;
 namespace NoMoreLegacy.Services.AI.Clients.Converter;
 
 public class StrutFileConverterClient(IConfiguration configuration, ILogger<StrutFileConverterClient> logger)
-    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger), IFileConversor
+    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini), IFileConversor
 {
     public SupportedFramework Framework => SupportedFramework.Struts;
 
@@ -12,30 +12,28 @@ public class StrutFileConverterClient(IConfiguration configuration, ILogger<Stru
         """
         Persona: You are an expert software engineer specializing in modernizing legacy Struts 1.3 + JSP applications into a decoupled Single-Page Application (SPA) architecture. You excel at separating backend business logic from frontend presentation.
         
-        Primary Objective: To deconstruct a Struts feature slice (`Action`, `ActionForm`, `JSP` page) into a stateless Spring Boot 6 REST API endpoint and a modern Angular 18+ standalone component.
+        Primary Objective: To deconstruct a Struts feature slice (`Action`, `ActionForm`, `JSP` page) into a stateless Spring Boot 6 REST API endpoint and a modern Angular 18+ standalone component, generating files with complete and correct source paths.
         
         Context: This conversion requires separating concerns. You will receive a group of files containing Struts Actions, Forms, and the corresponding JSP view. Your task is to create two sets of files: one for the Spring Boot API that handles the logic, and one for the Angular component that replaces the JSP for presentation.
         
         ## Detailed Instructions:
-        1.  **Scope Limitation**: Your only task is to convert the specific source files provided in the input. You **must not** generate any project boilerplate or configuration files like `pom.xml`, `package.json`, `build.gradle`, `angular.json`, or main application entry point classes (e.g., a class with `@SpringBootApplication`). A separate agent is responsible for all project scaffolding.
+        1.  **Scope Limitation**: Your only task is to convert the specific source files provided in the input. You **must not** generate any project boilerplate or configuration files (eg: `pom.xml`, `.gitignore`, `angular.json`, etc.). If any boilerplate or configuration files are provided in the input, **ignore them**.
         2.  Analyze all legacy `Files` (`.java` and `.jsp`) and the provided `Context`.
-        3.  **Library Migration**: Analyze the `Libraries` array in the `Context` and ensure the generated code uses the modern suggested libraries for both the backend and frontend.
-        4.  **For the Backend (Spring Boot):**
-            * **Golden Rule for Backend Conversion**: The generated Spring Boot backend **must** be a pure, stateless REST API. The `@RestController` methods **must never** return a `String` that represents a view name (like a `.jsp` or `.html` file). All methods **must** return `ResponseEntity` objects containing data (DTOs) or just an HTTP status code (e.g., `ResponseEntity.ok()`, `ResponseEntity.noContent()`). The backend must be completely decoupled from the frontend and have no knowledge of frontend page names or routing.
-            * Convert the Struts `Action` class into a Spring `@RestController`.
-            * Convert the `ActionForm` bean into a Java Record DTO with validation.
-            * Extract all business logic from the `Action`'s `execute` method into a new, injectable `@Service` class.
-        5.  **For the Frontend (Angular 18+):**
-            * Analyze the `.jsp` file to understand its structure and display logic.
-            * Create a new Angular `standalone` component (`.ts`, `.html`, `.scss`).
-            * Translate Struts and JSTL tags into modern Angular equivalents.
-            * Create an injectable Angular `service` that uses `HttpClient` to call the new Spring Boot API endpoint.
-        6.  **Directory Structure**: Ensure all generated backend files are in a Maven path (e.g., `com/myapp/...`) and all frontend files are in a separate `frontend` directory (e.g., `frontend/src/app/...`).
-        7.  **Reliability Rule**: If you encounter complex logic that is hard to decouple, you **must add an explanatory comment** in the code.
+        3.  **Library Migration**: Analyze the `Libraries` array in the `Context` and ensure the generated code uses the modern suggested libraries.
+        4.  **Backend File Path Rule**: All generated Java source files for the backend **must** have a full, standard Maven source path. The path **must** start with `src/main/java/` followed by the package structure. For example: `src/main/java/com/myapp/api/dto/AuthRequest.java`.
+        5.  **For the Backend (Spring Boot):**
+            * **Golden Rule for Backend Conversion**: The generated Spring Boot backend **must** be a pure, stateless REST API. The `@RestController` methods **must never** return a `String` that represents a view name. All methods **must** return `ResponseEntity` objects containing data (DTOs).
+            * Convert the Struts `Action` class into a Spring `@RestController` and place it in a `controller` or `api` sub-package.
+            * Convert the Struts `ActionForm` bean into a Java Record DTO and place it in a `dto` sub-package.
+            * Extract business logic into a new, injectable `@Service` class and place it in a `service` sub-package.
+        6.  **For the Frontend (Angular 18+):**
+            * All generated frontend files should be placed within a `frontend/` directory structure (e.g., `frontend/src/app/...`).
+            * Analyze the `.jsp` file to create a new Angular `standalone` component, service, and template.
+        7.  **Reliability Rule**: If you encounter complex logic, you **must add an explanatory comment** in the code.
         
         ## Critical Output Rules:
         * Your response must be **ONLY** the JSON object that matches the `ConversionResponse` schema.
-        * **DO NOT** include any explanations or commentary in your response, except for the requested `TODO` comments.
+        * **DO NOT** include any explanations or commentary in your response.
         
         ## Example Input
         {
@@ -87,15 +85,15 @@ public class StrutFileConverterClient(IConfiguration configuration, ILogger<Stru
         {
           "Files": [
             {
-              "Name": "com/myapp/api/dto/AuthRequest.java",
+              "Name": "src/main/java/com/myapp/api/dto/AuthRequest.java",
               "Content": "package com.myapp.api.dto;\n\npublic record AuthRequest(String username, String password) {}"
             },
             {
-              "Name": "com/myapp/api/AuthController.java",
+              "Name": "src/main/java/com/myapp/api/AuthController.java",
               "Content": "package com.myapp.api;\n\nimport com.myapp.service.AuthService;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.web.bind.annotation.*;\n\n@RestController\n@RequestMapping(\"/api/auth\")\npublic class AuthController {\n    private final AuthService authService;\n\n    public AuthController(AuthService authService) { this.authService = authService; }\n\n    @PostMapping(\"/login\")\n    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {\n        String token = authService.generateAuthToken(authRequest);\n        return ResponseEntity.ok(token);\n    }\n}"
             },
             {
-              "Name": "com/myapp/service/AuthService.java",
+              "Name": "src/main/java/com/myapp/service/AuthService.java",
               "Content": "package com.myapp.service;\n\nimport com.myapp.api.dto.AuthRequest;\nimport java.util.Base64;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class AuthService {\n    public String generateAuthToken(AuthRequest request) {\n        String originalInput = request.username() + \":\" + request.password();\n        String encodedString = Base64.getEncoder().encodeToString(originalInput.getBytes());\n        // TODO: [AI-CONFIDENCE: MEDIUM] Session logic was migrated to a token generation service. The session state management needs review.\n        return encodedString;\n    }\n}"
             },
             {

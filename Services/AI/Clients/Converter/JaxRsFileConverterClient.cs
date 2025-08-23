@@ -4,7 +4,7 @@ using NoMoreLegacy.Services.AI.HTTP;
 namespace NoMoreLegacy.Services.AI.Clients.Converter;
 
 public class JaxRsFileConverterClient(IConfiguration configuration, ILogger<JaxRsFileConverterClient> logger)
-    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger), IFileConversor
+    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini), IFileConversor
 {
     public SupportedFramework Framework => SupportedFramework.JaxRs;
 

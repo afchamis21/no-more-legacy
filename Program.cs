@@ -28,7 +28,7 @@ builder.Services.AddSingleton<JaxRsFileConverterClient>();
 builder.Services.AddSingleton<JsfFileConverterClient>();
 builder.Services.AddSingleton<StrutFileConverterClient>();
 
-builder.Services.AddSingleton<AngularScaffoldClient>();
+builder.Services.AddSingleton<AngularJsScaffoldClient>();
 builder.Services.AddSingleton<JaxRsScaffoldClient>();
 builder.Services.AddSingleton<JsfScaffoldClient>();
 builder.Services.AddSingleton<StrutScaffoldClient>();
