@@ -1,10 +1,9 @@
 ﻿using NoMoreLegacy.Services.AI.HTTP;
 using NoMoreLegacy.Services.AI.Models;
-using NoMoreLegacy.Util;
 
-namespace NoMoreLegacy.Services.AI.Clients;
+namespace NoMoreLegacy.Services.AI.Clients.Context;
 
-public class ContextExtractorClient(IConfiguration configuration, ILogger<ContextExtractorClient> logger)
+public class StrutContextExtractorClient(IConfiguration configuration, ILogger<StrutContextExtractorClient> logger)
     : OpenAiClient<ContextExtractionRequest, ContextExtractionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini)
 {
     protected override string SystemPrompt() =>
@@ -13,27 +12,51 @@ public class ContextExtractorClient(IConfiguration configuration, ILogger<Contex
         
         Primary Objective: To analyze a cohesive group of legacy files and extract its functional and technical context into a structured JSON format that aligns with our modern target architecture.
         
-        Context: You receive a group of files that has been pre-selected by a previous agent. Your task is to perform a deep analysis of this specific group to create a "dossier" that will guide the conversion agent. The richness and accuracy of the context you extract will determine the quality of the migration.
+        Context: You receive a group of files that has been pre-selected by a previous agent. Your task is to perform a deep analysis of this specific group to create a "dossier" that will guide the conversion agent.
+        
+        ## Output Schema Definition (C#)
+        Your JSON response MUST conform to the following C# record structure. The root object is `ContextExtractionResponse`.
+        
+        ```csharp
+        public record ContextExtractionResponse(FileGroupContext Context);
+        
+        public record FileGroupContext(
+            List<string> Functionalities,
+            List<Endpoint> Endpoints,
+            List<string> DataModels,
+            List<string> Dependencies,
+            List<string> Integrations,
+            List<LibraryMigration> Libraries
+        );
+        
+        public record LibraryMigration(string Old, string New);
+        
+        public record Endpoint(
+            string Url,
+            string Method,
+            List<string> Parameters,
+            string Return
+        );
+        ```
         
         ## Detailed Instructions:
-        1.  Analyze the group of `FileContent` provided in the request.
+        1.  Analyze the group of `FileContent` provided in the request, which may include `.java`, `.jsp`, and `.js` files.
         2.  **Target Stack Definition**: Our migration target is a modern, decoupled architecture. You **must** base all of your suggestions on the following target stack:
             * **Backend**: Spring Boot 6 with Java 21
             * **Frontend**: Angular 18+ (with standalone components)
-            When suggesting a `New` library, ensure it is compatible with these specific versions. For example, a migration from AngularJS should **always** target Angular 18+, never an older version like Angular 12.
         3.  Fill each field of the `FileGroupContext` object based on your analysis:
-            * `Functionalities`: Describe the main responsibilities of this file group.
-            * `Endpoints`: Identify all entry points and extract their details.
-            * `DataModels`: List the class names that represent data models.
+            * `Functionalities`: Describe the main responsibilities of the feature slice.
+            * `Endpoints`: Identify entry points from Struts `Action` classes, JAX-RS annotations, etc.
+            * `DataModels`: List the Java class names that represent data models (e.g., Struts `ActionForms`).
             * `Dependencies`: List the **internal** project dependencies.
-            * `Integrations`: List integrations with **external** systems.
-            * `Libraries`: Analyze `import` statements and dependencies. For each significant third-party library found, identify it and suggest its modern equivalent that is compatible with our defined **Target Stack**.
+            * `Integrations`: List integrations with **external** systems as a simple list of strings.
+            * `Libraries`: Analyze `import` statements and `<script>` tags. For each library, provide **only** the `Old` and `New` fields. **For the `New` field, you must choose the single best and most idiomatic modern replacement. Do not provide multiple options separated by "or".**
         4.  Your final output must be a JSON object that exactly matches the `ContextExtractionResponse` schema.
         
         ## Critical Output Rules:
         * **DO NOT** include any explanations, text, or commentary in your response.
         * Your response must be **ONLY** the JSON object, starting with `{` and ending with `}`.
-        * The JSON must be valid.
+        * The JSON must be valid and strictly follow the `ContextExtractionResponse` schema.
         
         ## Example Input:
         {
@@ -50,7 +73,7 @@ public class ContextExtractorClient(IConfiguration configuration, ILogger<Contex
             },
             {
               "Name": "webapp/login.jsp",
-              "Content": "<form action='/login.do' method='post'>...</form>"
+              "Content": "<script src=\"/js/angular.min.js\"></script><div ng-controller='LoginController'>...</div>"
             },
             {
               "Name": "webapp/js/login-controller.js",
@@ -86,11 +109,14 @@ public class ContextExtractorClient(IConfiguration configuration, ILogger<Contex
             "Libraries": [
               {
                 "Old": "Apache Commons Lang 3",
-                "New": "Spring Framework's StringUtils or Java 21 standard string methods"
+                "New": "Spring Framework's StringUtils"
+              },
+              {
+                "Old": "AngularJS",
+                "New": "Angular 18+"
               }
             ]
           }
         }
         """;
-  
 }

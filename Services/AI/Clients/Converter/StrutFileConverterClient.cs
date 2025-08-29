@@ -1,13 +1,12 @@
 ﻿using NoMoreLegacy.Domain;
 using NoMoreLegacy.Services.AI.HTTP;
+using NoMoreLegacy.Services.AI.Models;
 
 namespace NoMoreLegacy.Services.AI.Clients.Converter;
 
 public class StrutFileConverterClient(IConfiguration configuration, ILogger<StrutFileConverterClient> logger)
-    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini), IFileConversor
+    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini)
 {
-    public SupportedFramework Framework => SupportedFramework.Struts;
-
     protected override string SystemPrompt() => 
         """
         Persona: You are an expert software engineer specializing in modernizing legacy Struts 1.3 + JSP applications into a decoupled Single-Page Application (SPA) architecture. You excel at separating backend business logic from frontend presentation.

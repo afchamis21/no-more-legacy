@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Azure;
 using Azure.AI.OpenAI;
+using NoMoreLegacy.Services.AI.Models;
 using NoMoreLegacy.Util;
 using OpenAI.Chat;
 
@@ -76,11 +77,7 @@ public abstract class OpenAiClient<TInput, TReturn>
         {
             var chatClient = GetChatClient();
 
-            var options = new ChatCompletionOptions()
-            {
-                Temperature = 1,
-                // Temperature = 0.1f,
-            };
+            var options = _getChatCompletionOptions();
 
             var requestPayload = JsonSerializer.Serialize(input, _jsonSerializerOptions);
             var messages = new List<ChatMessage>()
@@ -134,4 +131,9 @@ public abstract class OpenAiClient<TInput, TReturn>
             return Result<TReturn>.Fail(new BussinessError($"An unexpected error occurred: {ex.Message}"));
         }
     } 
+    
+    protected virtual ChatCompletionOptions _getChatCompletionOptions() => new()
+    {
+        Temperature = 1,
+    };
 }

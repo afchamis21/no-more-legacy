@@ -1,4 +1,5 @@
 ﻿using NoMoreLegacy.Services.AI.HTTP;
+using NoMoreLegacy.Services.AI.Models;
 
 namespace NoMoreLegacy.Services.AI.Clients.Scaffold;
 

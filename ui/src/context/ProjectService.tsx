@@ -51,7 +51,6 @@ function ProjectServiceProvider(props: Props) {
     setIsLoading(true);
     try {
       const response = await ApiConversion(framework, project);
-      toast.success("Projeto convertido com sucesso!");
       const header = response.headers["content-disposition"];
       const fileName =
         header?.split("filename=")[1]?.replaceAll('"', "") || "download.zip";
@@ -74,6 +73,7 @@ function ProjectServiceProvider(props: Props) {
       );
       setConversionResult(res);
       setPreviewFiles(files);
+      toast.success("Projeto convertido com sucesso!");
       navigate("/preview");
     } catch (error) {
       console.error("Erro na conversão:", error);

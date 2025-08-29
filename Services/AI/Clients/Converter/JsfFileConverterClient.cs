@@ -1,13 +1,12 @@
 ﻿using NoMoreLegacy.Domain;
 using NoMoreLegacy.Services.AI.HTTP;
+using NoMoreLegacy.Services.AI.Models;
 
 namespace NoMoreLegacy.Services.AI.Clients.Converter;
 
 public class JsfFileConverterClient(IConfiguration configuration, ILogger<JsfFileConverterClient> logger)
-    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini), IFileConversor
+    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini)
 {
-    public SupportedFramework Framework => SupportedFramework.JaxRs;
-
     protected override string SystemPrompt() => 
         """
         Persona: You are an expert software engineer specializing in modernizing monolithic JSF applications into a decoupled Single-Page Application (SPA) architecture. You excel at separating backend logic from frontend presentation.

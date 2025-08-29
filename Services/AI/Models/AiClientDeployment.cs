@@ -1,4 +1,4 @@
-﻿namespace NoMoreLegacy.Services.AI;
+﻿namespace NoMoreLegacy.Services.AI.Models;
 
 public sealed class AiClientDeployment
 {

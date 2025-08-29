@@ -51,6 +51,7 @@ Esta seção detalha o progresso do design e engenharia de prompts dos agentes.
 
 ### Próximos Passos (Desenvolvimento):
 -   [ ] **Novo Agente: Framework Detector**: Criar um agente inicial que analisa o projeto e determina o framework legado automaticamente, em vez de exigir a seleção do usuário.
+-   [ ] **Nova Configuração**: Adicionar a possibilidade de configurar os parametros de temperatura etc. Individualmente por agente  
 -   [ ] **Refatoração dos Agentes**: Criar implementações específicas (extratores, agrupadores) por framework para aumentar ainda mais a precisão do pipeline.
 
 ---
@@ -102,8 +103,7 @@ Para executar este projeto localmente, siga os passos abaixo.
       },
       "AzureOpenAI": {
         "Endpoint": "SEU_ENDPOINT_AQUI",
-        "ApiKey": "SUA_API_KEY_AQUI",
-        "DeploymentName": "NOME_DO_SEU_DEPLOYMENT_GPT4"
+        "ApiKey": "SUA_API_KEY_AQUI"
       }
     }
     ```
@@ -126,6 +126,8 @@ Para iniciar uma migração, envie uma requisição `POST` para o endpoint princ
 -   **Body**: `multipart/form-data`
     -   `framework` (string): ex: "Struts"
     -   `file` (file): O arquivo `.zip` do projeto.
+
+Você pode usar os arquivos `.zip` na pasta [LegacyProjectExamples](./LegacyProjectExamples) para testar
 
 ---
 

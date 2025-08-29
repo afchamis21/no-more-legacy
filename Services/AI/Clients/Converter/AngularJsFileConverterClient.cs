@@ -1,13 +1,12 @@
 ﻿using NoMoreLegacy.Domain;
 using NoMoreLegacy.Services.AI.HTTP;
+using NoMoreLegacy.Services.AI.Models;
 
 namespace NoMoreLegacy.Services.AI.Clients.Converter;
 
 public class AngularJsFileConverterClient(IConfiguration configuration, ILogger<AngularJsFileConverterClient> logger)
-    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini), IFileConversor
+    : OpenAiClient<ConversionRequest, ConversionResponse>(configuration, logger, AiClientDeployment.Gpt5Mini)
 {
-    public SupportedFramework Framework => SupportedFramework.JaxRs;
-
     protected override string SystemPrompt() => 
         """
         Persona: You are an expert frontend developer specializing in migrating legacy AngularJS (1.x) applications to the latest version of Angular (18+). You are a master of TypeScript, RxJS, and modern component-based architecture.
